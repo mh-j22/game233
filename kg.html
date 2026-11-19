@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مغامرة العباقرة الصغار - KG</title>
+    <!-- خط تجوال للأرقام فقط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #E0F2FE 0%, #FEF3C7 50%, #FCE7F3 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .bg-dots {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.85) 3px, transparent 3px);
+            background-size: 36px 36px;
+        }
+
+        /* أزرار كرتونية كبيرة ومجسمة للمس السهل */
+        .btn-3d {
+            transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 0 rgba(0, 0, 0, 0.16), 0 14px 24px rgba(0, 0, 0, 0.12);
+        }
+        .btn-3d:active {
+            transform: translateY(7px) scale(0.97);
+            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.16), 0 6px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* بطاقات اللعب البصرية */
+        .visual-card {
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 10px 0 #CBD5E1, 0 14px 25px rgba(15, 23, 42, 0.08);
+        }
+        .visual-card:hover {
+            transform: translateY(-5px) scale(1.03);
+        }
+        .visual-card:active {
+            transform: translateY(5px) scale(0.96);
+            box-shadow: 0 4px 0 #CBD5E1;
+        }
+
+        /* حركات تفاعلية مبهجة */
+        @keyframes floatGentle {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        .animate-float {
+            animation: floatGentle 2.8s ease-in-out infinite;
+        }
+
+        @keyframes pulseSpeaker {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.08) rotate(-6deg); }
+            50% { transform: scale(1.12) rotate(6deg); }
+            75% { transform: scale(1.06) rotate(-3deg); }
+        }
+        .animate-speaker {
+            animation: pulseSpeaker 2.2s ease-in-out infinite;
+        }
+
+        @keyframes popCard {
+            0% { transform: scale(0.4) rotate(-4deg); opacity: 0; }
+            75% { transform: scale(1.06) rotate(1deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popCard 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes boingWiggle {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            20% { transform: translateX(-12px) rotate(-6deg); }
+            40% { transform: translateX(12px) rotate(6deg); }
+            60% { transform: translateX(-8px) rotate(-3deg); }
+            80% { transform: translateX(8px) rotate(3deg); }
+        }
+        .animate-boing {
+            animation: boingWiggle 0.55s ease-in-out;
+        }
+
+        @keyframes winCelebrate {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.14) rotate(3deg); }
+            70% { transform: scale(1.08) rotate(-2deg); }
+            100% { transform: scale(1.05); }
+        }
+        .animate-win {
+            animation: winCelebrate 0.6s ease-in-out forwards;
+            border-color: #22C55E !important;
+            background-color: #DCFCE7 !important;
+            box-shadow: 0 10px 0 #16A34A, 0 0 30px rgba(34, 197, 94, 0.45) !important;
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="bg-dots flex flex-col items-center justify-center p-2 sm:p-5">
+
+    <!-- كانفاس الاحتفال -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- الحاوية الرئيسية -->
+    <div class="w-full max-w-4xl mx-auto relative z-10">
+
+        <!-- ================= 1. شاشة البداية (بصرية 100% بدون قراءة) ================= -->
+        <div id="start-screen" class="bg-white/95 backdrop-blur-md rounded-[3rem] p-6 sm:p-10 text-center border-8 border-amber-300 shadow-2xl animate-pop">
+            
+            <!-- شخصية القرد الذكي SVG -->
+            <div class="w-44 h-44 sm:w-56 sm:h-56 mx-auto mb-4 animate-float">
+                <svg viewBox="0 0 220 220" class="w-full h-full drop-shadow-xl">
+                    <!-- الأذنان -->
+                    <circle cx="42" cy="105" r="28" fill="#92400E"/>
+                    <circle cx="42" cy="105" r="16" fill="#FDE68A"/>
+                    <circle cx="178" cy="105" r="28" fill="#92400E"/>
+                    <circle cx="178" cy="105" r="16" fill="#FDE68A"/>
+                    <!-- الرأس -->
+                    <ellipse cx="110" cy="112" rx="68" ry="64" fill="#B45309"/>
+                    <!-- خصلة الشعر -->
+                    <path d="M98 48 Q110 22 122 48 Q112 40 98 48 Z" fill="#78350F"/>
+                    <!-- قناع الوجه -->
+                    <ellipse cx="86" cy="98" rx="26" ry="28" fill="#FEF3C7"/>
+                    <ellipse cx="134" cy="98" rx="26" ry="28" fill="#FEF3C7"/>
+                    <ellipse cx="110" cy="134" rx="46" ry="34" fill="#FDE68A"/>
+                    <!-- العيون الكبيرة اللامعة -->
+                    <circle cx="88" cy="96" r="14" fill="#FFFFFF"/>
+                    <circle cx="132" cy="96" r="14" fill="#FFFFFF"/>
+                    <circle cx="90" cy="96" r="8" fill="#1E293B"/>
+                    <circle cx="130" cy="96" r="8" fill="#1E293B"/>
+                    <circle cx="93" cy="92" r="3" fill="#FFFFFF"/>
+                    <circle cx="133" cy="92" r="3" fill="#FFFFFF"/>
+                    <!-- الخدود الوردية -->
+                    <ellipse cx="68" cy="122" rx="10" ry="6" fill="#FDA4AF" opacity="0.8"/>
+                    <ellipse cx="152" cy="122" rx="10" ry="6" fill="#FDA4AF" opacity="0.8"/>
+                    <!-- الأنف والابتسامة -->
+                    <ellipse cx="110" cy="118" rx="7" ry="4" fill="#78350F"/>
+                    <path d="M86 134 Q110 156 134 134" stroke="#78350F" stroke-width="6" fill="none" stroke-linecap="round"/>
+                    <!-- نجمة ذهبية يحملها -->
+                    <polygon points="110,165 117,180 134,182 121,193 125,210 110,201 95,210 99,193 86,182 103,180" fill="#FBBF24" stroke="#F59E0B" stroke-width="3"/>
+                </svg>
+            </div>
+
+            <!-- شارات بصرية توضح نوع اللعبة (أشكال + صوت + نجوم) -->
+            <div class="flex items-center justify-center gap-4 mb-8">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-rose-100 rounded-3xl border-4 border-rose-300 flex items-center justify-center text-4xl shadow-md">🧩</div>
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-sky-100 rounded-3xl border-4 border-sky-300 flex items-center justify-center text-4xl shadow-md">🔊</div>
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-amber-100 rounded-3xl border-4 border-amber-300 flex items-center justify-center text-4xl shadow-md">⭐</div>
+            </div>
+
+            <!-- زر تشغيل ضخم بأيقونة Play واضحة للطفل -->
+            <button id="start-btn" aria-label="ابدأ" class="btn-3d bg-gradient-to-b from-emerald-400 to-emerald-600 hover:from-emerald-500 hover:to-emerald-700 text-white w-36 h-36 sm:w-44 sm:h-44 rounded-full border-8 border-emerald-200 inline-flex items-center justify-center cursor-pointer mx-auto">
+                <svg viewBox="0 0 100 100" class="w-20 h-20 sm:w-24 sm:h-24 fill-white translate-x-[-4px]">
+                    <polygon points="28,18 84,50 28,82" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- ================= 2. شاشة اللعب البصرية ================= -->
+        <div id="game-screen" class="hidden flex-col gap-3 sm:gap-5">
+            
+            <!-- الشريط العلوي: 15 نجمة تقدم بصرية + عداد النجوم + زر الصوت -->
+            <div class="bg-white/95 backdrop-blur-md rounded-3xl p-3 sm:p-4 border-4 border-sky-300 shadow-lg flex items-center justify-between gap-2 sm:gap-4">
+                
+                <!-- رقم المرحلة بأيقونة علم -->
+                <div class="flex items-center gap-1.5 bg-sky-100 px-3 sm:px-4 py-2 rounded-2xl border-2 border-sky-300 flex-shrink-0">
+                    <span class="text-2xl">🚩</span>
+                    <span id="level-counter" class="text-sky-900 font-black text-xl sm:text-2xl">1/15</span>
+                </div>
+
+                <!-- مسار الـ 15 خطوة البصرية -->
+                <div id="steps-track" class="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap px-1">
+                    <!-- يتم توليد 15 دائرة/نجمة هنا -->
+                </div>
+
+                <!-- عداد النجوم المكتسبة -->
+                <div class="flex items-center gap-1.5 bg-amber-100 px-3 sm:px-4 py-2 rounded-2xl border-2 border-amber-300 flex-shrink-0">
+                    <span class="text-2xl">⭐</span>
+                    <span id="stars-score" class="text-amber-800 font-black text-xl sm:text-2xl">0</span>
+                </div>
+            </div>
+
+            <!-- لوحة اللعب الرئيسية -->
+            <div class="bg-white/95 backdrop-blur-md rounded-[2.5rem] p-4 sm:p-7 border-8 border-indigo-200 shadow-xl relative">
+                
+                <!-- شريط التوجيه الصوتي والبصري العلوي -->
+                <div class="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+                    
+                    <!-- شخصية القرد الذكي المتفاعل بتعبيرات الوجه -->
+                    <div id="mascot-box" class="w-20 h-20 sm:w-24 sm:h-24 bg-amber-100 rounded-full p-1.5 border-4 border-amber-300 shadow-md flex-shrink-0 transition-transform duration-300">
+                        <svg id="mascot-svg" viewBox="0 0 220 220" class="w-full h-full">
+                            <circle cx="42" cy="105" r="28" fill="#92400E"/>
+                            <circle cx="42" cy="105" r="16" fill="#FDE68A"/>
+                            <circle cx="178" cy="105" r="28" fill="#92400E"/>
+                            <circle cx="178" cy="105" r="16" fill="#FDE68A"/>
+                            <ellipse cx="110" cy="112" rx="68" ry="64" fill="#B45309"/>
+                            <ellipse cx="86" cy="98" rx="26" ry="28" fill="#FEF3C7"/>
+                            <ellipse cx="134" cy="98" rx="26" ry="28" fill="#FEF3C7"/>
+                            <ellipse cx="110" cy="134" rx="46" ry="34" fill="#FDE68A"/>
+                            <circle cx="88" cy="96" r="14" fill="#FFFFFF"/>
+                            <circle cx="132" cy="96" r="14" fill="#FFFFFF"/>
+                            <circle cx="90" cy="96" r="8" fill="#1E293B"/>
+                            <circle cx="130" cy="96" r="8" fill="#1E293B"/>
+                            <circle cx="93" cy="92" r="3" fill="#FFFFFF"/>
+                            <circle cx="133" cy="92" r="3" fill="#FFFFFF"/>
+                            <ellipse cx="110" cy="118" rx="7" ry="4" fill="#78350F"/>
+                            <path id="mascot-mouth" d="M86 134 Q110 154 134 134" stroke="#78350F" stroke-width="7" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- أيقونة بصرية لنوع اللغز (عين / ظل / لغز / رابط) -->
+                    <div id="visual-cue-badge" class="flex items-center gap-2 bg-purple-100 px-5 py-3 rounded-3xl border-4 border-purple-300 shadow-inner">
+                        <span id="cue-icon-1" class="text-4xl sm:text-5xl">👀</span>
+                        <span id="cue-icon-2" class="text-3xl sm:text-4xl">❓</span>
+                    </div>
+
+                    <!-- زر مكبر الصوت الكبير لإعادة سماع السؤال -->
+                    <button id="speaker-btn" aria-label="اسمع السؤال" class="btn-3d animate-speaker bg-gradient-to-b from-amber-300 to-amber-500 hover:from-amber-400 hover:to-amber-600 text-amber-950 w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-amber-100 flex items-center justify-center cursor-pointer flex-shrink-0">
+                        <span class="text-4xl sm:text-5xl">🔊</span>
+                    </button>
+                </div>
+
+                <!-- منطقة المشهد / النمط / المصفوفة (تظهر في مراحل الظل، النمط، الربط، التماثل، والمصفوفة) -->
+                <div id="prompt-stage" class="hidden mb-5 sm:mb-7 bg-gradient-to-b from-sky-50 via-indigo-50 to-purple-50 rounded-[2rem] p-4 sm:p-6 border-4 border-dashed border-indigo-300 flex items-center justify-center min-h-[150px] sm:min-h-[190px]">
+                    <!-- يتم حقن الـ SVG الخاص بالمشهد أو النمط أو المصفوفة هنا -->
+                </div>
+
+                <!-- شبكة البطاقات البصرية (4 بطاقات في استخرج المختلف، أو 3 بطاقات في الاختيار) -->
+                <div id="cards-grid" class="grid grid-cols-2 gap-4 sm:gap-6">
+                    <!-- يتم توليد البطاقات البصرية هنا بدون أي نص -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= 3. شاشة النهاية والاحتفال الكبرى ================= -->
+        <div id="end-screen" class="hidden bg-white/95 backdrop-blur-md rounded-[3rem] p-6 sm:p-10 text-center border-8 border-amber-400 shadow-2xl animate-pop">
+            <div class="text-8xl sm:text-9xl mb-4 animate-bounce">🏆</div>
+            
+            <!-- عرض الـ 15 نجمة الذهبية -->
+            <div class="bg-amber-100 rounded-3xl p-5 max-w-md mx-auto mb-8 border-4 border-amber-300 flex items-center justify-center gap-3">
+                <span class="text-5xl sm:text-6xl animate-pulse">⭐</span>
+                <span id="final-stars-num" class="text-5xl sm:text-6xl font-black text-amber-700">15 / 15</span>
+            </div>
+
+            <!-- زر إعادة اللعب بأيقونة واضحة -->
+            <button id="restart-btn" aria-label="العب مجدداً" class="btn-3d bg-gradient-to-b from-sky-400 to-sky-600 hover:from-sky-500 hover:to-sky-700 text-white w-32 h-32 sm:w-36 sm:h-36 rounded-full border-8 border-sky-200 inline-flex items-center justify-center cursor-pointer mx-auto">
+                <span class="text-6xl sm:text-7xl">🔄</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * 1. مكتبة الرسومات البصرية عالية الجودة (SVG Generators) لأطفال KG
+         * ============================================================================
+         */
+        const SVG = {
+            // --- أشكال هندسية ---
+            circleRed: (size = 110) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" class="drop-shadow-md">
+                    <circle cx="60" cy="60" r="48" fill="#EF4444" stroke="#B91C1C" stroke-width="5"/>
+                    <ellipse cx="44" cy="40" rx="14" ry="8" transform="rotate(-30 44 40)" fill="#FCA5A5" opacity="0.75"/>
+                </svg>`,
+            squareBlue: (size = 110) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" class="drop-shadow-md">
+                    <rect x="16" y="16" width="88" height="88" rx="18" fill="#3B82F6" stroke="#1D4ED8" stroke-width="5"/>
+                    <rect x="26" y="24" width="32" height="12" rx="6" fill="#93C5FD" opacity="0.75"/>
+                </svg>`,
+            starYellow: (size = 100) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" class="drop-shadow-md">
+                    <polygon points="60,10 75,42 110,47 84,71 91,106 60,89 29,106 36,71 10,47 45,42" fill="#FACC15" stroke="#CA8A04" stroke-width="5" stroke-linejoin="round"/>
+                    <circle cx="52" cy="54" r="4" fill="#713F12"/><circle cx="68" cy="54" r="4" fill="#713F12"/>
+                    <path d="M54 64 Q60 70 66 64" stroke="#713F12" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                </svg>`,
+            heartRed: (size = 100) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" class="drop-shadow-md">
+                    <path d="M60 102 C60 102 14 72 14 40 C14 22 28 12 43 12 C52 12 58 17 60 23 C62 17 68 12 77 12 C92 12 106 22 106 40 C106 72 60 102 60 102 Z" fill="#F43F5E" stroke="#BE123C" stroke-width="5"/>
+                    <ellipse cx="36" cy="32" rx="10" ry="6" transform="rotate(-35 36 32)" fill="#FDA4AF" opacity="0.8"/>
+                </svg>`,
+            triangleGreen: (size = 100) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" class="drop-shadow-md">
+                    <polygon points="60,14 108,100 12,100" fill="#22C55E" stroke="#15803D" stroke-width="6" stroke-linejoin="round"/>
+                </svg>`,
+            squareOrange: (size = 100) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" class="drop-shadow-md">
+                    <rect x="16" y="16" width="88" height="88" rx="16" fill="#F97316" stroke="#C2410C" stroke-width="6"/>
+                </svg>`,
+
+            // --- تفاحة (للمقارنة بالحجم) ---
+            apple: (size = 120) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" class="drop-shadow-md">
+                    <path d="M60 32 C42 26 20 38 22 66 C24 94 46 108 60 104 C74 108 96 94 98 66 C100 38 78 26 60 32 Z" fill="#EF4444" stroke="#B91C1C" stroke-width="4"/>
+                    <path d="M60 32 Q62 14 74 10" stroke="#78350F" stroke-width="6" fill="none" stroke-linecap="round"/>
+                    <path d="M62 22 Q82 12 88 26 Q74 34 62 22 Z" fill="#22C55E" stroke="#15803D" stroke-width="3"/>
+                    <ellipse cx="38" cy="52" rx="8" ry="14" transform="rotate(-20 38 52)" fill="#FCA5A5" opacity="0.7"/>
+                </svg>`,
+
+            // --- سمكة (للاتجاهات: يمين أو يسار) ---
+            fish: (dir = 'right', color = '#06B6D4', size = 125) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 140 120" class="drop-shadow-md" style="transform: scaleX(${dir === 'left' ? -1 : 1})">
+                    <!-- الذيل -->
+                    <polygon points="36,60 8,32 16,60 8,88" fill="#F59E0B" stroke="#B45309" stroke-width="4" stroke-linejoin="round"/>
+                    <!-- الزعنفة العلوية -->
+                    <path d="M58 32 Q75 12 92 34 Z" fill="#F59E0B" stroke="#B45309" stroke-width="3"/>
+                    <!-- الجسم -->
+                    <ellipse cx="78" cy="60" rx="48" ry="32" fill="${color}" stroke="#0E7490" stroke-width="4"/>
+                    <!-- قشور لطيفة -->
+                    <path d="M66 48 Q74 60 66 72 M80 46 Q88 60 80 74" stroke="#CFFAFE" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <!-- العين -->
+                    <circle cx="106" cy="52" r="8" fill="#FFFFFF"/>
+                    <circle cx="108" cy="52" r="4" fill="#0F172A"/>
+                    <!-- الابتسامة -->
+                    <path d="M112 68 Q118 72 124 66" stroke="#0F172A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                </svg>`,
+
+            // --- المرحلة 4: الديناصور وظلاله ---
+            dino: (mode = 'color', variant = 'normal', size = 135) => {
+                const isShadow = mode === 'shadow';
+                const bodyFill = isShadow ? '#1E293B' : '#10B981';
+                const spikeFill = isShadow ? '#1E293B' : '#F59E0B';
+                const strokeColor = isShadow ? '#0F172A' : '#047857';
+                return `
+                <svg width="${size}" height="${size}" viewBox="0 0 160 150" class="drop-shadow-md">
+                    <!-- أشواك الظهر (تتغير في الظل الخاطئ 1) -->
+                    ${variant !== 'noSpikes' ? `
+                        <polygon points="48,54 36,42 56,42" fill="${spikeFill}"/>
+                        <polygon points="42,72 26,64 46,62" fill="${spikeFill}"/>
+                        <polygon points="40,92 24,88 42,82" fill="${spikeFill}"/>
+                    ` : ''}
+                    <!-- الذيل (يتغير في الظل الخاطئ 2 ليصبح طويلاً ومرفوعاً) -->
+                    ${variant === 'longTail' 
+                        ? `<path d="M46 112 Q5 95 10 55 Q24 85 52 98 Z" fill="${bodyFill}" stroke="${strokeColor}" stroke-width="4"/>`
+                        : `<path d="M46 112 L16 118 L48 96 Z" fill="${bodyFill}" stroke="${strokeColor}" stroke-width="4" stroke-linejoin="round"/>`
+                    }
+                    <!-- الجسم والرقبة والرأس -->
+                    <path d="M48 115 C44 85 52 55 72 34 C82 22 108 22 116 36 C122 46 116 58 100 60 L92 62 C94 82 98 102 92 118 L84 118 L84 136 L70 136 L70 118 L58 118 L58 136 L44 136 L44 115 Z" fill="${bodyFill}" stroke="${strokeColor}" stroke-width="4" stroke-linejoin="round"/>
+                    <!-- ذراع صغيرة -->
+                    <path d="M92 78 L108 82 L104 88 L90 84 Z" fill="${bodyFill}" stroke="${strokeColor}" stroke-width="3"/>
+                    ${!isShadow ? `
+                        <circle cx="102" cy="38" r="6" fill="#FFFFFF"/>
+                        <circle cx="104" cy="38" r="3" fill="#0F172A"/>
+                        <path d="M100 50 Q108 53 114 48" stroke="#064E3B" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <circle cx="72" cy="82" r="5" fill="#059669"/>
+                        <circle cx="66" cy="98" r="6" fill="#059669"/>
+                    ` : ''}
+                </svg>`;
+            },
+
+            // --- المرحلة 8: الأجزاء والكل (نمط جلد الحيوان والحيوانات) ---
+            zebraPatch: (size = 130) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" class="drop-shadow-md">
+                    <rect x="10" y="10" width="100" height="100" rx="24" fill="#F8FAFC" stroke="#475569" stroke-width="5"/>
+                    <path d="M12 32 Q45 42 65 24 Q85 45 108 30 L108 46 Q85 60 65 40 Q45 58 12 48 Z" fill="#1E293B"/>
+                    <path d="M12 68 Q45 78 65 60 Q85 80 108 66 L108 82 Q85 96 65 76 Q45 94 12 84 Z" fill="#1E293B"/>
+                </svg>`,
+            zebra: (size = 115) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 130 130" class="drop-shadow-md">
+                    <!-- أذنان -->
+                    <ellipse cx="44" cy="26" rx="8" ry="16" transform="rotate(-15 44 26)" fill="#F8FAFC" stroke="#1E293B" stroke-width="4"/>
+                    <ellipse cx="86" cy="26" rx="8" ry="16" transform="rotate(15 86 26)" fill="#F8FAFC" stroke="#1E293B" stroke-width="4"/>
+                    <!-- الرأس -->
+                    <rect x="36" y="32" width="58" height="78" rx="28" fill="#F8FAFC" stroke="#1E293B" stroke-width="4"/>
+                    <!-- خطوط الحمار الوحشي -->
+                    <path d="M38 50 L54 55 M92 50 L76 55 M37 66 L52 70 M93 66 L78 70" stroke="#1E293B" stroke-width="6" stroke-linecap="round"/>
+                    <!-- الأنف والفم -->
+                    <ellipse cx="65" cy="92" rx="24" ry="16" fill="#64748B"/>
+                    <circle cx="57" cy="90" r="3" fill="#0F172A"/><circle cx="73" cy="90" r="3" fill="#0F172A"/>
+                    <!-- العيون -->
+                    <circle cx="50" cy="62" r="6" fill="#0F172A"/><circle cx="80" cy="62" r="6" fill="#0F172A"/>
+                </svg>`,
+            giraffe: (size = 115) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 130 130" class="drop-shadow-md">
+                    <!-- قرون -->
+                    <line x1="50" y1="32" x2="44" y2="14" stroke="#92400E" stroke-width="5"/><circle cx="44" cy="14" r="6" fill="#92400E"/>
+                    <line x1="80" y1="32" x2="86" y2="14" stroke="#92400E" stroke-width="5"/><circle cx="86" cy="14" r="6" fill="#92400E"/>
+                    <!-- الرأس -->
+                    <rect x="36" y="30" width="58" height="80" rx="28" fill="#FBBF24" stroke="#B45309" stroke-width="4"/>
+                    <!-- بقع الزرافة -->
+                    <circle cx="48" cy="48" r="6" fill="#92400E"/><circle cx="82" cy="50" r="5" fill="#92400E"/>
+                    <ellipse cx="65" cy="92" rx="24" ry="16" fill="#FDE68A"/>
+                    <circle cx="50" cy="64" r="6" fill="#0F172A"/><circle cx="80" cy="64" r="6" fill="#0F172A"/>
+                </svg>`,
+            frog: (size = 115) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 130 130" class="drop-shadow-md">
+                    <circle cx="44" cy="38" r="16" fill="#22C55E" stroke="#15803D" stroke-width="4"/>
+                    <circle cx="86" cy="38" r="16" fill="#22C55E" stroke="#15803D" stroke-width="4"/>
+                    <circle cx="44" cy="38" r="8" fill="#FFFFFF"/><circle cx="44" cy="38" r="4" fill="#0F172A"/>
+                    <circle cx="86" cy="38" r="8" fill="#FFFFFF"/><circle cx="86" cy="38" r="4" fill="#0F172A"/>
+                    <ellipse cx="65" cy="76" rx="46" ry="34" fill="#22C55E" stroke="#15803D" stroke-width="4"/>
+                    <path d="M42 80 Q65 98 88 80" stroke="#14532D" stroke-width="5" fill="none" stroke-linecap="round"/>
+                </svg>`,
+
+            // --- المرحلة 11: إطارات النجوم (3 نجوم مقابل نجمتين) ---
+            starBox: (count = 3, size = 135) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 150 130" class="drop-shadow-md">
+                    <rect x="8" y="12" width="134" height="106" rx="22" fill="#EEF2FF" stroke="#6366F1" stroke-width="5"/>
+                    ${count === 3 ? `
+                        <polygon points="42,35 47,46 59,48 50,56 52,68 42,62 32,68 34,56 25,48 37,46" fill="#FACC15" stroke="#CA8A04" stroke-width="2.5"/>
+                        <polygon points="108,35 113,46 125,48 116,56 118,68 108,62 98,68 100,56 91,48 103,46" fill="#FACC15" stroke="#CA8A04" stroke-width="2.5"/>
+                        <polygon points="75,68 80,79 92,81 83,89 85,101 75,95 65,101 67,89 58,81 70,79" fill="#FACC15" stroke="#CA8A04" stroke-width="2.5"/>
+                    ` : `
+                        <polygon points="48,48 53,59 65,61 56,69 58,81 48,75 38,81 40,69 31,61 43,59" fill="#FACC15" stroke="#CA8A04" stroke-width="2.5"/>
+                        <polygon points="102,48 107,59 119,61 110,69 112,81 102,75 92,81 94,69 85,61 97,59" fill="#FACC15" stroke="#CA8A04" stroke-width="2.5"/>
+                    `}
+                </svg>`,
+
+            // --- المرحلة 12: الصاروخ الفضائي وظلاله الدقيقة ---
+            rocket: (mode = 'color', variant = 'normal', size = 135) => {
+                const isShadow = mode === 'shadow';
+                const body = isShadow ? '#1E293B' : '#F8FAFC';
+                const nose = isShadow ? '#1E293B' : '#EF4444';
+                const fin = isShadow ? '#1E293B' : '#3B82F6';
+                const stroke = isShadow ? '#0F172A' : '#334155';
+                return `
+                <svg width="${size}" height="${size}" viewBox="0 0 150 150" class="drop-shadow-md">
+                    <!-- الزعانف الجانبية -->
+                    ${variant === 'roundFins' ? `
+                        <circle cx="44" cy="102" r="18" fill="${fin}" stroke="${stroke}" stroke-width="4"/>
+                        <circle cx="106" cy="102" r="18" fill="${fin}" stroke="${stroke}" stroke-width="4"/>
+                    ` : `
+                        <polygon points="50,82 24,114 52,110" fill="${fin}" stroke="${stroke}" stroke-width="4" stroke-linejoin="round"/>
+                        <polygon points="100,82 126,114 98,110" fill="${fin}" stroke="${stroke}" stroke-width="4" stroke-linejoin="round"/>
+                    `}
+                    <!-- اللهب السفلي (يختفي في الظل الخاطئ 2) -->
+                    ${variant !== 'noFlame' ? `
+                        <path d="M62 116 Q75 144 88 116 Z" fill="${isShadow ? '#1E293B' : '#F59E0B'}"/>
+                    ` : ''}
+                    <!-- جسم الصاروخ -->
+                    <path d="M75 16 C98 40 102 80 96 114 L54 114 C48 80 52 40 75 16 Z" fill="${body}" stroke="${stroke}" stroke-width="4"/>
+                    <!-- مقدمة الصاروخ -->
+                    <path d="M75 16 C86 28 92 40 94 48 L56 48 C58 40 64 28 75 16 Z" fill="${nose}"/>
+                    ${!isShadow ? `
+                        <circle cx="75" cy="72" r="14" fill="#38BDF8" stroke="#0284C7" stroke-width="4"/>
+                        <circle cx="71" cy="68" r="4" fill="#FFFFFF" opacity="0.8"/>
+                    ` : ''}
+                </svg>`;
+            },
+
+            // --- المرحلة 14: التماثل البصري (نصف فراشة أيسر + أنصاف يمنى) ---
+            butterflyLeft: (size = 135) => `
+                <svg width="${size}" height="${size}" viewBox="0 0 140 140" class="drop-shadow-md">
+                    <!-- خط التماثل المنقط -->
+                    <line x1="120" y1="10" x2="120" y2="130" stroke="#94A3B8" stroke-width="4" stroke-dasharray="8 8"/>
+                    <!-- الجناح العلوي الأيسر (وردي مع دائرة صفراء) -->
+                    <path d="M116 58 C80 12 20 18 24 56 C28 82 82 78 116 68 Z" fill="#EC4899" stroke="#9D174D" stroke-width="4"/>
+                    <circle cx="62" cy="48" r="14" fill="#FACC15"/>
+                    <!-- الجناح السفلي الأيسر (بنفسجي مع قلب سماوي) -->
+                    <path d="M116 74 C82 74 34 86 42 114 C50 134 94 118 116 88 Z" fill="#8B5CF6" stroke="#5B21B6" stroke-width="4"/>
+                    <circle cx="72" cy="98" r="10" fill="#38BDF8"/>
+                    <!-- نصف الجسم وقرن الاستشعار -->
+                    <path d="M114 34 Q102 16 92 18" stroke="#1E293B" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <rect x="112" y="34" width="8" height="76" rx="4" fill="#1E293B"/>
+                </svg>`,
+            butterflyRight: (variant = 'match', size = 120) => {
+                const topColor = variant === 'match' ? '#EC4899' : (variant === 'wrongColor' ? '#22C55E' : '#EC4899');
+                const botColor = variant === 'match' ? '#8B5CF6' : (variant === 'wrongColor' ? '#F97316' : '#8B5CF6');
+                return `
+                <svg width="${size}" height="${size}" viewBox="0 0 140 140" class="drop-shadow-md">
+                    <line x1="20" y1="10" x2="20" y2="130" stroke="#94A3B8" stroke-width="4" stroke-dasharray="8 8"/>
+                    ${variant === 'wrongShape' ? `
+                        <!-- جناح مثلثي مختلف تماماً -->
+                        <polygon points="24,58 122,22 104,76" fill="${topColor}" stroke="#9D174D" stroke-width="4"/>
+                        <polygon points="24,78 110,95 86,126" fill="${botColor}" stroke="#5B21B6" stroke-width="4"/>
+                    ` : `
+                        <!-- الجناح العلوي الأيمن المطابق -->
+                        <path d="M24 58 C60 12 120 18 116 56 C112 82 58 78 24 68 Z" fill="${topColor}" stroke="#334155" stroke-width="4"/>
+                        <circle cx="78" cy="48" r="14" fill="#FACC15"/>
+                        <!-- الجناح السفلي الأيمن المطابق -->
+                        <path d="M24 74 C58 74 106 86 98 114 C90 134 46 118 24 88 Z" fill="${botColor}" stroke="#334155" stroke-width="4"/>
+                        <circle cx="68" cy="98" r="10" fill="#38BDF8"/>
+                    `}
+                    <path d="M26 34 Q38 16 48 18" stroke="#1E293B" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <rect x="20" y="34" width="8" height="76" rx="4" fill="#1E293B"/>
+                </svg>`;
+            },
+
+            // --- رمز الاستفهام البصري للأنماط ---
+            questionBox: (size = 86) => `
+                <div style="width:${size}px;height:${size}px" class="rounded-2xl bg-amber-100 border-4 border-dashed border-amber-500 flex items-center justify-center text-4xl sm:text-5xl font-black text-amber-600 animate-pulse shadow-inner">
+                    ؟
+                </div>`,
+
+            // --- إيموجي كبير واضح كعنصر SVG-ready ---
+            emoji: (char, sizeClass = 'text-7xl sm:text-8xl') => `
+                <span class="${sizeClass} leading-none select-none drop-shadow-sm">${char}</span>`
+        };
+
+        /**
+         * ============================================================================
+         * 2. الـ 15 مرحلة المتدرجة لتنمية التفكير الناقد البصري (KG1 & KG2)
+         * ============================================================================
+         */
+        const KG_LEVELS = [
+            // المرحلة 1: استخرج المختلف - الأشكال (3 دوائر حمراء ومربع أزرق)
+            {
+                voice: "فين الشكل المختلف؟",
+                cue: ['👀', '❓'],
+                gridCols: 'grid-cols-2',
+                options: [
+                    { html: SVG.circleRed(), correct: false, bg: 'bg-rose-50' },
+                    { html: SVG.circleRed(), correct: false, bg: 'bg-rose-50' },
+                    { html: SVG.squareBlue(), correct: true, bg: 'bg-blue-50' },
+                    { html: SVG.circleRed(), correct: false, bg: 'bg-rose-50' }
+                ]
+            },
+            // المرحلة 2: استخرج المختلف - الحجم (3 تفاحات كبيرة وتفاحة صغيرة جداً)
+            {
+                voice: "فين التفاحة الصغيرة المختلفة؟",
+                cue: ['🍎', '🔍'],
+                gridCols: 'grid-cols-2',
+                options: [
+                    { html: SVG.apple(130), correct: false, bg: 'bg-red-50' },
+                    { html: SVG.apple(54), correct: true, bg: 'bg-amber-50' },
+                    { html: SVG.apple(130), correct: false, bg: 'bg-red-50' },
+                    { html: SVG.apple(130), correct: false, bg: 'bg-red-50' }
+                ]
+            },
+            // المرحلة 3: استخرج المختلف - الاتجاه (3 أسماك لليمين وواحدة لليسار)
+            {
+                voice: "بص كويس! فين السمكة اللي ماشية في اتجاه مختلف؟",
+                cue: ['🐠', '↔️'],
+                gridCols: 'grid-cols-2',
+                options: [
+                    { html: SVG.fish('right'), correct: false, bg: 'bg-cyan-50' },
+                    { html: SVG.fish('right'), correct: false, bg: 'bg-cyan-50' },
+                    { html: SVG.fish('right'), correct: false, bg: 'bg-cyan-50' },
+                    { html: SVG.fish('left', '#EC4899'), correct: true, bg: 'bg-pink-50' }
+                ]
+            },
+            // المرحلة 4: مطابقة الظل - Shadow Matching (ديناصور ملون + 3 ظلال)
+            {
+                voice: "مين صاحب الظل ده؟ ركز في الذيل والظهر!",
+                cue: ['🦖', '👤'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `<div class="animate-float">${SVG.dino('color', 'normal', 150)}</div>`,
+                options: [
+                    { html: SVG.dino('shadow', 'noSpikes', 115), correct: false, bg: 'bg-slate-100' },
+                    { html: SVG.dino('shadow', 'normal', 115), correct: true, bg: 'bg-slate-100' },
+                    { html: SVG.dino('shadow', 'longTail', 115), correct: false, bg: 'bg-slate-100' }
+                ]
+            },
+            // المرحلة 5: إكمال النمط - Pattern Recognition (نجمة، قلب، نجمة، قلب، [؟])
+            {
+                voice: "نجمة، قلب، نجمة، قلب... إيه الشكل اللي عليه الدور؟",
+                cue: ['🧩', '❓'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `
+                    <div class="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
+                        ${SVG.starYellow(72)}
+                        ${SVG.heartRed(72)}
+                        ${SVG.starYellow(72)}
+                        ${SVG.heartRed(72)}
+                        ${SVG.questionBox(76)}
+                    </div>`,
+                options: [
+                    { html: SVG.starYellow(96), correct: true, bg: 'bg-yellow-50' },
+                    { html: SVG.heartRed(96), correct: false, bg: 'bg-rose-50' },
+                    { html: SVG.squareBlue(96), correct: false, bg: 'bg-blue-50' }
+                ]
+            },
+            // المرحلة 6: الربط المنطقي - السبب والنتيجة (سحابة ممطرة -> مظلة)
+            {
+                voice: "الدنيا بتمطر! هنحتاج إيه عشان نحمي نفسنا؟",
+                cue: ['🌧️', '💡'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `<div class="animate-float">${SVG.emoji('🌧️', 'text-8xl sm:text-9xl')}</div>`,
+                options: [
+                    { html: SVG.emoji('🍦'), correct: false, bg: 'bg-pink-50' },
+                    { html: SVG.emoji('☂️'), correct: true, bg: 'bg-purple-50' },
+                    { html: SVG.emoji('🕶️'), correct: false, bg: 'bg-amber-50' }
+                ]
+            },
+            // المرحلة 7: استخرج المختلف - التصنيف المنطقي (3 طيور وأخطبوط)
+            {
+                voice: "تلاتة بيطيروا في السماء، وواحد بيعيش في البحر! فين المختلف؟",
+                cue: ['🦅', '🌊'],
+                gridCols: 'grid-cols-2',
+                options: [
+                    { html: SVG.emoji('🦜'), correct: false, bg: 'bg-emerald-50' },
+                    { html: SVG.emoji('🦉'), correct: false, bg: 'bg-amber-50' },
+                    { html: SVG.emoji('🐙'), correct: true, bg: 'bg-indigo-50' },
+                    { html: SVG.emoji('🐦'), correct: false, bg: 'bg-sky-50' }
+                ]
+            },
+            // المرحلة 8: الأجزاء والكل - Part-to-Whole (خطوط الحمار الوحشي)
+            {
+                voice: "القطعة دي بتاعة مين في الحيوانات دي؟",
+                cue: ['🔍', '🦓'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `<div class="animate-float">${SVG.zebraPatch(135)}</div>`,
+                options: [
+                    { html: SVG.giraffe(110), correct: false, bg: 'bg-amber-50' },
+                    { html: SVG.zebra(110), correct: true, bg: 'bg-slate-100' },
+                    { html: SVG.frog(110), correct: false, bg: 'bg-green-50' }
+                ]
+            },
+            // المرحلة 9: إكمال النمط المتقدم - الألوان والأحجام (مثلث كبير، مثلث صغير، مربع كبير، [؟])
+            {
+                voice: "مثلث كبير، مثلث صغير، مربع كبير... يبقى ناقص إيه؟",
+                cue: ['📐', '❓'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `
+                    <div class="flex items-center justify-center gap-3 sm:gap-5 flex-wrap">
+                        ${SVG.triangleGreen(88)}
+                        ${SVG.triangleGreen(46)}
+                        ${SVG.squareOrange(88)}
+                        ${SVG.questionBox(76)}
+                    </div>`,
+                options: [
+                    { html: SVG.squareOrange(95), correct: false, bg: 'bg-orange-50' },
+                    { html: SVG.triangleGreen(48), correct: false, bg: 'bg-green-50' },
+                    { html: SVG.squareOrange(48), correct: true, bg: 'bg-orange-50' }
+                ]
+            },
+            // المرحلة 10: الربط المنطقي - الغذاء والموطن (أرنب -> جزرة)
+            {
+                voice: "الأرنب جعان! بيحب ياكل إيه؟",
+                cue: ['🐰', '🍽️'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `<div class="animate-float">${SVG.emoji('🐰', 'text-8xl sm:text-9xl')}</div>`,
+                options: [
+                    { html: SVG.emoji('🦴'), correct: false, bg: 'bg-slate-50' },
+                    { html: SVG.emoji('🥕'), correct: true, bg: 'bg-orange-50' },
+                    { html: SVG.emoji('🐟'), correct: false, bg: 'bg-cyan-50' }
+                ]
+            },
+            // المرحلة 11: استخرج المختلف - الكمية/العدد (3 إطارات بها 3 نجوم وإطار به نجمتان)
+            {
+                voice: "عد النجوم كويس! فين المربع اللي فيه نجوم أقل؟",
+                cue: ['⭐', '🔢'],
+                gridCols: 'grid-cols-2',
+                options: [
+                    { html: SVG.starBox(3), correct: false, bg: 'bg-indigo-50' },
+                    { html: SVG.starBox(3), correct: false, bg: 'bg-indigo-50' },
+                    { html: SVG.starBox(3), correct: false, bg: 'bg-indigo-50' },
+                    { html: SVG.starBox(2), correct: true, bg: 'bg-amber-50' }
+                ]
+            },
+            // المرحلة 12: مطابقة الظل الدقيق (صاروخ فضائي + 3 ظلال متقاربة)
+            {
+                voice: "ركز في الصاروخ كويس! فين الظل بتاعه بالظبط؟",
+                cue: ['🚀', '👤'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `<div class="animate-float">${SVG.rocket('color', 'normal', 150)}</div>`,
+                options: [
+                    { html: SVG.rocket('shadow', 'roundFins', 115), correct: false, bg: 'bg-slate-100' },
+                    { html: SVG.rocket('shadow', 'noFlame', 115), correct: false, bg: 'bg-slate-100' },
+                    { html: SVG.rocket('shadow', 'normal', 115), correct: true, bg: 'bg-slate-100' }
+                ]
+            },
+            // المرحلة 13: العلاقة المنطقية - الحر والبرد (رجل ثلج -> قفازات شتوية)
+            {
+                voice: "الجو برد جداً عند رجل الثلج! نلبس إيه في إيدينا؟",
+                cue: ['⛄', '❄️'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `<div class="animate-float">${SVG.emoji('⛄', 'text-8xl sm:text-9xl')}</div>`,
+                options: [
+                    { html: SVG.emoji('🧤'), correct: true, bg: 'bg-sky-50' },
+                    { html: SVG.emoji('🩳'), correct: false, bg: 'bg-yellow-50' },
+                    { html: SVG.emoji('🍉'), correct: false, bg: 'bg-red-50' }
+                ]
+            },
+            // المرحلة 14: إكمال النصف المفقود - التماثل البصري (نصف فراشة)
+            {
+                voice: "النص التاني من الفراشة ضاع! فين النص اللي يكملها صح؟",
+                cue: ['🦋', '🪞'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `<div class="animate-float">${SVG.butterflyLeft(145)}</div>`,
+                options: [
+                    { html: SVG.butterflyRight('wrongColor', 110), correct: false, bg: 'bg-emerald-50' },
+                    { html: SVG.butterflyRight('match', 110), correct: true, bg: 'bg-pink-50' },
+                    { html: SVG.butterflyRight('wrongShape', 110), correct: false, bg: 'bg-purple-50' }
+                ]
+            },
+            // المرحلة 15: لغز التفكير الناقد الشامل - مصفوفة 2×2 (شمس صفراء -> زهرة صفراء | سحابة زرقاء -> قطرة ماء زرقاء)
+            {
+                voice: "لغز العباقرة! الشمس الصفراء معاها زهرة صفراء، طب السحابة الزرقاء يناسبها إيه؟",
+                cue: ['👑', '🧠'],
+                gridCols: 'grid-cols-3',
+                promptHtml: `
+                    <div class="grid grid-cols-3 gap-2 sm:gap-4 items-center bg-white/80 p-3 sm:p-4 rounded-3xl border-4 border-indigo-200 shadow-inner">
+                        <div class="text-5xl sm:text-6xl">☀️</div>
+                        <div class="text-3xl sm:text-4xl text-indigo-400 font-black">⬅️</div>
+                        <div class="text-5xl sm:text-6xl">🌻</div>
+                        
+                        <div class="text-5xl sm:text-6xl">☁️</div>
+                        <div class="text-3xl sm:text-4xl text-indigo-400 font-black">⬅️</div>
+                        <div class="flex justify-center">${SVG.questionBox(64)}</div>
+                    </div>`,
+                options: [
+                    { html: SVG.emoji('🍓'), correct: false, bg: 'bg-rose-50' },
+                    { html: SVG.emoji('💧'), correct: true, bg: 'bg-sky-50' },
+                    { html: SVG.emoji('🍀'), correct: false, bg: 'bg-green-50' }
+                ]
+            }
+        ];
+
+        /**
+         * ============================================================================
+         * 3. محرك الصوت والنطق العربي (Web Audio API + SpeechSynthesis)
+         * ============================================================================
+         */
+        class KidAudioEngine {
+            constructor() {
+                this.ctx = null;
+            }
+
+            ensureContext() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            // صوت فقاعة لطيف عند الضغط
+            playBubble() {
+                this.ensureContext();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                const now = this.ctx.currentTime;
+                osc.frequency.setValueAtTime(380, now);
+                osc.frequency.exponentialRampToValueAtTime(760, now + 0.11);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.11);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.11);
+            }
+
+            // لحن تشجيعي مرح وتصفيق عند الإجابة الصحيحة
+            playWinChime() {
+                this.ensureContext();
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    const start = this.ctx.currentTime + i * 0.085;
+                    osc.frequency.setValueAtTime(freq, start);
+                    gain.gain.setValueAtTime(0.24, start);
+                    gain.gain.exponentialRampToValueAtTime(0.01, start + 0.28);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(start);
+                    osc.stop(start + 0.28);
+                });
+            }
+
+            // صوت "بوينج" مضحك ولطيف عند الخطأ (بدون إحباط الطفل)
+            playBoing() {
+                this.ensureContext();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                const now = this.ctx.currentTime;
+                osc.frequency.setValueAtTime(260, now);
+                osc.frequency.exponentialRampToValueAtTime(160, now + 0.12);
+                osc.frequency.exponentialRampToValueAtTime(230, now + 0.26);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.28);
+            }
+
+            // موسيقى الفوز بالنهاية
+            playGrandFinale() {
+                this.ensureContext();
+                const seq = [
+                    { f: 523.25, t: 0, d: 0.14 },
+                    { f: 659.25, t: 0.14, d: 0.14 },
+                    { f: 783.99, t: 0.28, d: 0.14 },
+                    { f: 1046.50, t: 0.44, d: 0.4 },
+                    { f: 783.99, t: 0.88, d: 0.16 },
+                    { f: 1046.50, t: 1.06, d: 0.6 }
+                ];
+                seq.forEach(n => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    const start = this.ctx.currentTime + n.t;
+                    osc.frequency.setValueAtTime(n.f, start);
+                    gain.gain.setValueAtTime(0.26, start);
+                    gain.gain.exponentialRampToValueAtTime(0.01, start + n.d);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(start);
+                    osc.stop(start + n.d);
+                });
+            }
+
+            // نطق عربي تلقائي واضح ومرح لطفل رياض الأطفال
+            speakArabic(text) {
+                if (!('speechSynthesis' in window)) return;
+                try {
+                    window.speechSynthesis.cancel();
+                    const utter = new SpeechSynthesisUtterance(text);
+                    const voices = window.speechSynthesis.getVoices();
+                    const arVoice = voices.find(v => v.lang.includes('ar-EG')) || voices.find(v => v.lang.includes('ar'));
+                    if (arVoice) utter.voice = arVoice;
+                    utter.lang = arVoice ? arVoice.lang : 'ar-EG';
+                    utter.rate = 0.9;   // هادئ وواضح للطفل
+                    utter.pitch = 1.18; // نبرة مبهجة
+                    window.speechSynthesis.speak(utter);
+                } catch (err) {}
+            }
+        }
+
+        const audio = new KidAudioEngine();
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+        }
+
+        /**
+         * ============================================================================
+         * 4. نظام القصاصات الورقية الملونة (Confetti)
+         * ============================================================================
+         */
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const cCtx = confettiCanvas.getContext('2d');
+        let confettiPieces = [];
+        let confettiFrame = null;
+
+        function fitConfettiCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', fitConfettiCanvas);
+        fitConfettiCanvas();
+
+        function burstConfetti(amount = 65) {
+            const palette = ['#FF595E', '#FFCA3A', '#8AC926', '#1982C4', '#6A4C93', '#FF99C8'];
+            for (let i = 0; i < amount; i++) {
+                confettiPieces.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: -20 - Math.random() * 80,
+                    w: Math.random() * 12 + 7,
+                    h: Math.random() * 8 + 5,
+                    color: palette[Math.floor(Math.random() * palette.length)],
+                    vy: Math.random() * 4.5 + 3,
+                    vx: (Math.random() - 0.5) * 4.5,
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 12
+                });
+            }
+            if (!confettiFrame) renderConfetti();
+        }
+
+        function renderConfetti() {
+            cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confettiPieces.forEach((p, idx) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.rot += p.vRot;
+                cCtx.save();
+                cCtx.translate(p.x, p.y);
+                cCtx.rotate((p.rot * Math.PI) / 180);
+                cCtx.fillStyle = p.color;
+                cCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                cCtx.restore();
+                if (p.y > confettiCanvas.height + 30) confettiPieces.splice(idx, 1);
+            });
+            if (confettiPieces.length > 0) {
+                confettiFrame = requestAnimationFrame(renderConfetti);
+            } else {
+                confettiFrame = null;
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 5. إدارة سير اللعب والمراحل الـ 15
+         * ============================================================================
+         */
+        let currentIdx = 0;
+        let starsCount = 0;
+        let locked = false;
+
+        const PRAISE_VOICE = [
+            "برافو عليك! شاطر جداً!",
+            "ممتاز يا عبقري!",
+            "هايل! إجابة صح!",
+            "يا سلام عليك! ذكي جداً!",
+            "أحسنت يا بطل!"
+        ];
+
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const levelCounterEl = document.getElementById('level-counter');
+        const stepsTrackEl = document.getElementById('steps-track');
+        const starsScoreEl = document.getElementById('stars-score');
+        const cueIcon1 = document.getElementById('cue-icon-1');
+        const cueIcon2 = document.getElementById('cue-icon-2');
+        const promptStage = document.getElementById('prompt-stage');
+        const cardsGrid = document.getElementById('cards-grid');
+        const mascotBox = document.getElementById('mascot-box');
+        const mascotMouth = document.getElementById('mascot-mouth');
+
+        // بناء مسار الـ 15 نجمة في الشريط العلوي
+        function buildStepsTrack() {
+            stepsTrackEl.innerHTML = '';
+            for (let i = 0; i < KG_LEVELS.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs sm:text-sm transition-all duration-300 border-2';
+                if (i < currentIdx) {
+                    dot.className += ' bg-amber-400 border-amber-500 text-white scale-100';
+                    dot.textContent = '⭐';
+                } else if (i === currentIdx) {
+                    dot.className += ' bg-sky-400 border-sky-600 text-white scale-125 shadow-md animate-pulse';
+                    dot.textContent = '●';
+                } else {
+                    dot.className += ' bg-slate-200 border-slate-300 text-transparent';
+                }
+                stepsTrackEl.appendChild(dot);
+            }
+        }
+
+        // تغيير تعبير وجه القرد الكرتوني (سعيد / متعجب / متحمس)
+        function setMascotMood(mood) {
+            if (mood === 'happy') {
+                mascotMouth.setAttribute('d', 'M82 130 Q110 164 138 130 Z');
+                mascotMouth.setAttribute('fill', '#EF4444');
+                mascotBox.classList.add('scale-110', 'bg-emerald-200', 'border-emerald-400');
+            } else if (mood === 'oops') {
+                mascotMouth.setAttribute('d', 'M98 140 A 12 12 0 1 0 122 140 A 12 12 0 1 0 98 140');
+                mascotMouth.setAttribute('fill', '#78350F');
+                mascotBox.classList.add('animate-boing');
+            } else {
+                mascotMouth.setAttribute('d', 'M86 134 Q110 154 134 134');
+                mascotMouth.setAttribute('fill', 'none');
+                mascotBox.classList.remove('scale-110', 'bg-emerald-200', 'border-emerald-400', 'animate-boing');
+            }
+        }
+
+        function startAdventure() {
+            audio.playBubble();
+            currentIdx = 0;
+            starsCount = 0;
+            starsScoreEl.textContent = '0';
+
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+
+            renderLevel(currentIdx);
+        }
+
+        function renderLevel(index) {
+            locked = false;
+            setMascotMood('normal');
+            const lvl = KG_LEVELS[index];
+
+            // تحديث العداد وشريط الـ 15 خطوة
+            levelCounterEl.textContent = `${index + 1}/15`;
+            buildStepsTrack();
+
+            // تحديث الأيقونات البصرية الإرشادية
+            cueIcon1.textContent = lvl.cue[0];
+            cueIcon2.textContent = lvl.cue[1];
+
+            // إظهار أو إخفاء منطقة المشهد العلوي (للظلال، الأنماط، الربط، التماثل، والمصفوفة)
+            if (lvl.promptHtml) {
+                promptStage.innerHTML = lvl.promptHtml;
+                promptStage.classList.remove('hidden');
+            } else {
+                promptStage.classList.add('hidden');
+                promptStage.innerHTML = '';
+            }
+
+            // ضبط شبكة البطاقات (2×2 للمختلف، أو 3 أعمدة للاختيار البصري)
+            cardsGrid.className = `grid ${lvl.gridCols} gap-3 sm:gap-6`;
+            cardsGrid.innerHTML = '';
+
+            lvl.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `visual-card ${opt.bg} rounded-[2rem] p-4 sm:p-6 border-4 border-slate-200 flex items-center justify-center min-h-[145px] sm:min-h-[185px] cursor-pointer animate-pop`;
+                btn.style.animationDelay = `${i * 0.08}s`;
+                btn.innerHTML = opt.html;
+
+                btn.addEventListener('click', () => onCardTap(btn, opt, lvl));
+                cardsGrid.appendChild(btn);
+            });
+
+            // نطق السؤال تلقائياً عند دخول المرحلة
+            setTimeout(() => {
+                audio.speakArabic(lvl.voice);
+            }, 320);
+        }
+
+        function onCardTap(cardBtn, option, lvl) {
+            if (locked) return;
+
+            if (option.correct) {
+                locked = true;
+                audio.playWinChime();
+                burstConfetti(60);
+                setMascotMood('happy');
+
+                starsCount++;
+                starsScoreEl.textContent = starsCount;
+                cardBtn.classList.add('animate-win');
+
+                const praise = PRAISE_VOICE[Math.floor(Math.random() * PRAISE_VOICE.length)];
+                audio.speakArabic(praise);
+
+                setTimeout(() => {
+                    currentIdx++;
+                    if (currentIdx < KG_LEVELS.length) {
+                        renderLevel(currentIdx);
+                    } else {
+                        finishAdventure();
+                    }
+                }, 1650);
+
+            } else {
+                // اهتزاز لطيف وصوت بوينج مرح مع إعادة نطق السؤال لتوجيه الطفل
+                audio.playBoing();
+                setMascotMood('oops');
+
+                cardBtn.classList.remove('animate-boing');
+                void cardBtn.offsetWidth;
+                cardBtn.classList.add('animate-boing', 'border-rose-300', 'bg-rose-50', 'opacity-70');
+
+                setTimeout(() => {
+                    setMascotMood('normal');
+                    audio.speakArabic("جرب تاني! " + lvl.voice);
+                }, 650);
+            }
+        }
+
+        function finishAdventure() {
+            gameScreen.classList.add('hidden');
+            gameScreen.classList.remove('flex');
+            endScreen.classList.remove('hidden');
+
+            document.getElementById('final-stars-num').textContent = `${starsCount} / 15`;
+            audio.playGrandFinale();
+            burstConfetti(130);
+            audio.speakArabic("مبروك يا بطل! كسبت كل النجوم وبقيت عبقري كبير!");
+        }
+
+        // ربط الأحداث
+        document.getElementById('start-btn').addEventListener('click', startAdventure);
+        document.getElementById('restart-btn').addEventListener('click', startAdventure);
+        document.getElementById('speaker-btn').addEventListener('click', () => {
+            audio.playBubble();
+            const lvl = KG_LEVELS[currentIdx];
+            if (lvl) audio.speakArabic(lvl.voice);
+        });
+    </script>
+</body>
+</html>
